@@ -156,3 +156,140 @@ Grazie ai container possiamo:
 - Automatizzare il ciclo di vita delle applicazioni
 
 > 💡 *"Se funziona nel tuo container, funzionerà ovunque."*
+
+# Docker vs Podman: Demone centrale e confronto
+
+## 🔧 Docker: demone centrale
+Docker funziona secondo un'architettura **client-server**:
+
+- Il comando `docker` che usi nel terminale è il **client**.
+- Il demone `dockerd` è il **server** che riceve i comandi dal client e li esegue (creare container, scaricare immagini, gestire reti, volumi, ecc).
+- Questo demone gira **continuamente in background** e **richiede privilegi di root** per funzionare (tranne con configurazioni specifiche).
+
+### Problemi associati:
+- **Sicurezza**: un demone che gira con privilegi elevati può rappresentare un rischio.
+- **Gestione risorse**: se il demone si blocca, tutti i container ne risentono.
+- **Architettura monolitica**: tutto passa attraverso un unico punto.
+
+---
+
+## 🧱 Podman: no demone centrale
+- Podman **non ha un demone in background**.
+- Ogni comando (`podman run`, `podman build`, ecc.) viene eseguito come **un singolo processo**, gestito direttamente dall'utente (anche senza root).
+- Questo lo rende **più sicuro** e più adatto a contesti dove si cerca la **massima separazione dei privilegi**.
+
+### Vantaggi:
+- Può essere usato da utenti **non-root** senza compromessi.
+- Nessun processo centrale da monitorare o riavviare.
+- Ogni container è **figlio diretto del processo utente** che lo ha lanciato.
+
+---
+
+## 🧱 Docker vs Podman: Tabella comparativa
+
+| Caratteristica              | **Docker**                                       | **Podman**                                      |
+|-----------------------------|--------------------------------------------------|--------------------------------------------------|
+| 🔧 Architettura             | Client-Server (CLI ↔ `dockerd`)                 | Senza demone (no server centrale)               |
+| 🔐 Sicurezza                | Richiede demone con privilegi elevati (root)    | Può essere usato **senza root** (rootless)      |
+| 🧑‍💻 Gestione container     | Tutti i container sono gestiti dal demone Docker| Ogni container è gestito dal processo utente     |
+| 🔁 Compatibilità CLI        | Comandi `docker` standard                        | Compatibile 1:1 con i comandi `docker`           |
+| 📦 Immagini                | Usa formato OCI (via Docker Hub o registries)   | Usa lo stesso formato OCI, pienamente compatibile|
+| 🔄 Build immagini          | Usa `docker build`, supporta BuildKit           | Usa `buildah` (internamente o esternamente)     |
+| 👥 Supporto a pod           | ❌ No (solo container singoli o Compose)         | ✅ Sì (concetto nativo di **pod** come in Kubernetes) |
+| ⚙️ Runtime container        | Usa `containerd` + `runc`                       | Usa `crun` o `runc`                              |
+| 📄 Dockerfile              | Supportato nativamente                          | Supportato nativamente                          |
+| 📁 Docker Compose          | ✅ Sì (strumento ufficiale)                      | 🟡 Compatibile via `podman-compose` (meno maturo) |
+| ☁️ Registry integrato      | Docker Hub + supporto altri registry            | Nessun registry proprietario, usa OCI registries |
+| 💻 Desktop GUI             | Docker Desktop (GUI + VM)                       | Podman Desktop (GUI alternativa)                |
+| ⚙️ Orchestrazione          | Docker Swarm, o integrato con Kubernetes        | Nessun orchestratore nativo, lavora con Kubernetes |
+| 🔍 Ispezione container     | `docker inspect`                                | `podman inspect` (molto simile)                 |
+| 🧪 Progetto open source    | Open source (con componenti aziendali)          | Completamente open source (Red Hat, Fedora)     |
+
+---
+
+## ✅ Vantaggi principali
+
+| Docker                                   | Podman                                      |
+|------------------------------------------|----------------------------------------------|
+| Maturità, ampia community e supporto     | Sicurezza senza root, architettura moderna   |
+| Integrazione facile con Docker Compose   | Pod nativi come in Kubernetes                |
+| Tooling solido (Docker Desktop, Hub, ecc)| Non richiede demone, ideale per sistemi minimal |
+| Supporto ufficiale per Windows/macOS     | Ottimo per ambienti Linux e sviluppatori orientati a sicurezza |
+
+---
+
+# 🚀 Kubernetes vs Docker
+
+## 🧭 Kubernetes vs Docker: Differenze di livello
+
+- **Docker** è uno **strumento per creare ed eseguire container**.
+- **Kubernetes** è un **sistema di orchestrazione** che gestisce **cluster** di container in ambienti distribuiti (più macchine).
+
+In realtà, **non sono in competizione**, ma lavorano **a livelli diversi della pila tecnologica**.
+
+---
+
+## 📌 Quando usare Docker da solo
+
+Usi **solo Docker** quando:
+- Hai **una singola macchina** (server, VM o laptop).
+- L’applicazione è **piccola o media**, con pochi container.
+- Vuoi sviluppare, testare o fare deploy in modo **semplice e diretto**.
+- L’infrastruttura non richiede alta disponibilità o scalabilità automatica.
+
+**Esempi:**
+- Un’app Flask o Node.js in container con un database.
+- Un’app a microservizi locale gestita con `docker-compose`.
+- Progetti personali, demo, prototipi.
+
+---
+
+## 📌 Quando usare Kubernetes
+
+Usi **Kubernetes** quando:
+- Hai bisogno di **scalare automaticamente** le tue applicazioni.
+- Vuoi **alta disponibilità** e **failover** automatico.
+- Gestisci **più container distribuiti** su più nodi (macchine).
+- Hai bisogno di funzionalità come:
+  - Load balancing
+  - Rolling updates
+  - Auto-healing (restart automatico dei container falliti)
+  - Secrets/config maps
+  - Gestione dello storage persistente
+- Lavori in ambienti **cloud-native**, **CI/CD** avanzati, o **microservizi su larga scala**.
+
+**Esempi:**
+- Un sistema SaaS con decine di microservizi in cloud.
+- Un e-commerce distribuito con molteplici componenti.
+- Infrastrutture enterprise multi-cluster.
+
+---
+
+## 🧱 Schema visivo semplificato
+
+| Caratteristica                | **Docker (da solo)**       | **Kubernetes**                    |
+|-------------------------------|-----------------------------|------------------------------------|
+| Ambito                        | Singola macchina            | Cluster distribuito               |
+| Gestione container            | Manuale o con Compose       | Automatizzata e orchestrata       |
+| Scalabilità                   | Manuale                     | Automatica                         |
+| Tolleranza ai guasti          | Limitata                    | Alta (auto-restart, replica)      |
+| Rolling updates               | ❌ No                        | ✅ Sì                              |
+| Load balancing                | ❌ No                        | ✅ Sì                              |
+| Complessità                   | Bassa                       | Alta                               |
+| Curva di apprendimento        | Facile                      | Ripida                             |
+
+---
+
+## 🔄 Come lavorano insieme
+
+Un tempo, **Docker veniva usato anche all’interno di Kubernetes**, ma oggi Kubernetes usa direttamente **containerd** come runtime (senza Docker Engine). Tuttavia, **Docker rimane utilissimo** per:
+- Costruire immagini (`docker build`)
+- Testare localmente
+- Usare strumenti come Docker Compose in dev
+
+---
+
+## ✅ In sintesi
+
+- **Usa Docker** se sei in locale, progetto piccolo, o vuoi semplicità.
+- **Usa Kubernetes** se hai **bisogno di gestire in modo professionale e scalabile** molti container distribuiti, in produzione o ambienti complessi.
