@@ -293,3 +293,22 @@ Un tempo, **Docker veniva usato anche all’interno di Kubernetes**, ma oggi Kub
 
 - **Usa Docker** se sei in locale, progetto piccolo, o vuoi semplicità.
 - **Usa Kubernetes** se hai **bisogno di gestire in modo professionale e scalabile** molti container distribuiti, in produzione o ambienti complessi.
+
+
+# ✅ Kubernetes: Pro e Contro
+
+
+| Categoria                        | ✅ Pro (Vantaggi)                                                                 | ❌ Contro (Svantaggi)                                                             |
+|----------------------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| Scalabilità                      | Auto-scaling orizzontale, gestione carichi variabili                             | Richiede configurazione avanzata per scalabilità efficace                       |
+| Alta disponibilità               | Failover automatico, auto-restart container                                     | Maggiore complessità operativa                                                  |
+| Gestione dichiarativa           | Configurazione via YAML, infrastruttura come codice                             | Difficile da leggere e mantenere per team non esperti                           |
+| Aggiornamenti                   | Rolling updates e rollback automatici                                           | Possibili errori se i deployment non sono configurati correttamente             |
+| Multi-tenancy                   | Namespaces per ambienti/team separati                                           | Gestione RBAC e sicurezza complessa                                             |
+| Ecosistema e community          | Ampio supporto di estensioni e strumenti (Helm, Istio, ArgoCD, ecc.)            | Tooling frammentato, learning curve elevata                                     |
+| Config e Segreti                | Gestione integrata di Secrets e ConfigMap                                       | Richiede attenzione per evitare esposizione accidentale                        |
+| Storage persistente             | Supporto a volumi per applicazioni stateful                                     | Configurazione più complicata rispetto a Docker                                 |
+| Portabilità                     | Funziona su cloud, bare-metal, on-prem, locale                                  | DevOps richiesto per adattarsi a contesti diversi                               |
+| Complessità                     | Architettura potente e flessibile                                               | Alta complessità per piccoli progetti                                           |
+| Costi                           | Adatto a grandi sistemi distribuiti                                             | Maggiore utilizzo risorse = costi più alti (cloud, gestione, manutenzione)      |
+| Debug e monitoraggio            | Supporta tool avanzati (Prometheus, Grafana, ecc.)                              | Debug più difficile, servono skill avanzate                                     |
